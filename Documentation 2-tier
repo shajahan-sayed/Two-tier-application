@@ -1,0 +1,13 @@
+Main.tf
+step:1 - created vpc
+step:2 - created 2 public subnets and 2 private subnets
+step:3 - created IGW and attached to vpc
+step:4 - created route table for public
+step:5 - attached IGW to route table
+step:6 - created route association to attach subnet to route table
+step:7 - create elastic IP 
+step:8 - attach elastic ip to nat gate way after creating it and reside in the public subnet
+step:9 - create route table for private attach or inside VPC
+step:10 - attaching nat gateway to route table or NAT Gateway Route for Private Subnets
+step:11 - created route association to attach private subent to private route table
+step:12 - create SG for EC2 and RDS.
