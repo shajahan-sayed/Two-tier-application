@@ -81,8 +81,110 @@ resource "aws_route_table_association" public_subnet_2_association" {
   route_table_id = aws_route_table.public_rt
 }
 
+#Creating elastic ip and assigning to nat gateway
+resource "aws_eip" "nat_eip" {
+ domain="vpc"
+}
+
 # NAT gateway for private subnets
 resource "aws_nat_gateway" "NAT" {
+ allowcation_id = aws_eip.nat_eip
+ subnet_id = aws_subnet.public_subnet1
+
+  tags = {
+    Name = "NAT"
+  }
+
+ depends on = [aws_internet_gateway.igw]
+}
+
+#creating route table for private subnet
+resource "aws_subnet" "private_rt" {
+ vpc.id = aws_vpc.vpc_2tier
+
+ tags = {
+   Name = "private_rt"
+ }
+}
+
+#attaching nat gateway to private subnets
+
+resource "aws_route" "private_nat_gateway_rt" {
+ route_table_id = aws_route_table_id.private_rt
+ destination_cidr_block = "0.0.0.0/0"
+ gateway_id = aws_nat_gateway.NAT
+}
+
+#associate private subnets with private route table
+ resource "route" "private_subnet1_ association" {
+  subnet_id = aws_subnet.private_subnet1
+  route_table_id = aws.route_table_id.private_rt
+ }
+resource "route" "private_subnet_association" {
+  subnet_id = aws_subnet.private_subnet2
+  route_table_id = aws.route_table_id.private_rt
+}
+
+##security group
+#EC2 security group allow (http & SSH)
+resource "aws_security_group" "ec2_sg" {
+ vpc_id = aws_vpc.vpc_2tier
+
+ ingress {
+ desscription = "allow SSH"
+ from_port = 22
+ to_port = 22
+ protocol    = "tcp"
+ cidr_blocks = ["0.0.0.0/0"] # Change to your IP for security
+}
+
+ingress {
+ description = "Allow HTTP"
+ from_port   = 80
+ to_port     = 80
+ protocol    = "tcp"
+ cidr_blocks = ["0.0.0.0/0"]
+}
+egress {
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+  tags = {
+     Name = "EC2-SG"
+  }
+}
+## 🗄️ RDS Security Group (Allows MySQL from EC2)
+resource "aws_security_group" "rds_sg" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  ingress {
+    description     = "Allow MySQL from EC2"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ec2_sg.id] # Only allow EC2
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "RDS-SG" }
+}
+
+  
+
+
+  
+  
+
+
 
 
 
