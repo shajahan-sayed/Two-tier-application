@@ -48,4 +48,20 @@ resource "aws_subnet" "public_subnet2" {
       Name = "private_subnet2"
     }
   }
+
+#creating internet gateway for public access
+resource "aws_internet_gateway" "igw"{
+  vpc.id = aws_vpc.vpc_2tier
+
+  tags = {
+    Name = "igw"
+}
+
+#creating route table for public subnet
+resource "aws_route_table" "public_rt" {
+ vpc.id = aws_vpc.vpc_2tier
+ 
+
+
+
   
