@@ -60,7 +60,30 @@ resource "aws_internet_gateway" "igw"{
 #creating route table for public subnet
 resource "aws_route_table" "public_rt" {
  vpc.id = aws_vpc.vpc_2tier
- 
+
+ tags = {
+   Name = "public_rt"
+ }
+
+#creating route for public internet access(connecting with internet gateway)
+resource "aws_route" "public_internet_access" {
+ route_table_id = aws_route_table.public_rt 
+ destination_cidr_block  = "0.0.0.0/0"
+ gate_way_id = aws_internet_gateway.igw
+}
+#associate public subnet with route table
+resource "aws_route_table_association" "public_subnet_1_association" {
+ subnet_id = aws_subnet.public_subnet1
+ route_table_id = aws_route_table.public_rt
+}
+resource "aws_route_table_association" public_subnet_2_association" {
+  subnet_id = aws_subnet.public_subnet2
+  route_table_id = aws_route_table.public_rt
+}
+
+# NAT gateway for private subnets
+resource "aws_nat_gateway" "NAT" {
+
 
 
 
